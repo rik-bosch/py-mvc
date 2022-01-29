@@ -4,25 +4,31 @@ from mvc import (Model, View, Controller)
 
 
 class MessageModel(Model):
+    """The main app model, MessageModel shows a simple hello/goodbye message to the user."""
+
     def __init__(self, message: str):
         super().__init__()
         self.message = message
 
     @staticmethod
     def open():
-        model = MessageModel("Hallo wereld!")
+        """Starts the app with a TextView and a ButtonView."""
+        model = MessageModel("Hello world!")
         main_view = MainView(model, "Test app")
         model.attach(main_view)
         main_view.add_child(TextView(model, main_view))
-        main_view.add_child(ButtonView(model, main_view, "Klik mij", model, model.say_goodbye.__func__))
+        main_view.add_child(ButtonView(model, main_view, "Click me", model, model.say_goodbye.__func__))
         main_view.run()
 
     def say_goodbye(self):
-        self.message = "Tot ziens!"
+        """"A very basic action, to show the use of a Controller."""
+        self.message = "See you later!"
         self.notify()
 
 
 class MainView(View):
+    """The MainView is a container for all child views, this implementation does not yet support multiple running MainViews."""
+
     def __init__(self, model: Model, title: str):
         super().__init__(model)
         self.window = Tk()
@@ -35,6 +41,8 @@ class MainView(View):
 
 
 class TextView(View):
+    """A TextView shows some text to the user."""
+
     def __init__(self, model: MessageModel, parent: MainView):
         super().__init__(model, parent)
         self.textVar = StringVar(value=model.message)
@@ -46,6 +54,8 @@ class TextView(View):
 
 
 class ButtonView(View):
+    """A ButtonView shows a button with a simple click action."""
+
     def __init__(self, model: Model, parent: MainView, label: str, target: object, method: callable):
         super().__init__(model, parent)
         self.controller = ButtonController(model, self, target, method)
@@ -54,6 +64,7 @@ class ButtonView(View):
 
 
 class ButtonController(Controller):
+    """This is the standard Controller for a ButtonView, it calls the target method whenever a user left clicks the button."""
     def __init__(self, model: Model, view: ButtonView, target: object, method: callable):
         super().__init__(model, view)
         self.target = target
